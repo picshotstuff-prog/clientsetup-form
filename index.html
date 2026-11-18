@@ -1829,13 +1829,14 @@
     media.innerHTML = '';
     media.appendChild(img);
   }
-  reviewerVideo.addEventListener('error', reviewerFallback);
-  /* the video may already have failed before this script ran */
-  if(reviewerVideo.error || reviewerVideo.networkState === 3) reviewerFallback();
+  /* fall back to the GIF / placeholder ONLY on a real loading error */
+  reviewerVideo.addEventListener('error', () => { if(reviewerVideo.error) reviewerFallback(); });
+  if(reviewerVideo.error) reviewerFallback();
   function openReviewer(){
     reviewerShown = true;
     document.getElementById('reviewerModal').classList.add('show');
-    if(reviewerVideo.isConnected && (reviewerVideo.error || reviewerVideo.networkState === 3)) reviewerFallback();
+    if(reviewerVideo.isConnected && reviewerVideo.error) reviewerFallback();
+    if(reviewerVideo.isConnected && reviewerVideo.readyState === 0) reviewerVideo.load();
     const p = reviewerVideo.isConnected && reviewerVideo.play();
     if(p && p.catch) p.catch(() => {});
   }
