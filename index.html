@@ -857,6 +857,20 @@
     color:#57534b;
     line-height:1.6;
   }
+  /* ---------- PicShot Studio Reviewer intro pop-up ---------- */
+  .reviewer-card{max-width:620px; padding:30px 30px 26px 30px;}
+  .reviewer-kicker{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--orange-3);background:linear-gradient(120deg, rgba(253,184,19,0.15), rgba(239,127,26,0.15));padding:5px 12px;border-radius:999px;margin-bottom:12px;}
+  .reviewer-card p{margin-bottom:18px;}
+  .reviewer-media{position:relative;width:100%;aspect-ratio:1280/760;border-radius:14px;overflow:hidden;background:#FFF6E6;border:1px solid var(--line);margin:0 0 20px 0;box-shadow:0 10px 26px rgba(20,20,20,0.10);}
+  .reviewer-media video,.reviewer-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#000;}
+  .reviewer-media .media-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:13px;font-weight:600;}
+  .reviewer-media .media-placeholder svg{width:46px;height:46px;}
+  .reviewer-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .reviewer-close{position:absolute;top:12px;right:14px;border:none;background:transparent;font-size:24px;line-height:1;color:#b8ac97;cursor:pointer;padding:4px 8px;border-radius:8px;}
+  .reviewer-close:hover{color:var(--orange-3);background:#FFF6E6;}
+  .demo-link{border:none;background:none;padding:0;margin-left:8px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.2px;text-transform:none;color:var(--orange-3);cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+  .demo-link:hover{color:var(--orange-2);}
+
   /* ---------- Decorative layer (paint splats + sparkles) ---------- */
   .deco-layer{
     position:absolute;
@@ -1254,7 +1268,7 @@
           </div>
         </div>
         <div class="subgroup">
-          <div class="subgroup-title">Animation delivery</div>
+          <div class="subgroup-title">Animation delivery <button type="button" class="demo-link" onclick="openReviewer()">▶ See PicShot Studio Reviewer</button></div>
           <div class="options-grid" data-category="visual">
             <label class="option"><input type="checkbox" value="Google Drive (Delivery)"><span class="opt-logo"><img src="logos/google-drive.png" alt="Google Drive" loading="lazy" onerror="this.style.display='none';this.parentNode.classList.add('logo-missing');"></span><span class="option-label">Google Drive <span class="opt-note">· animation previews</span></span>
               <span class="tip"><span class="tip-title">Google Drive · Animation Previews</span>We&rsquo;ll upload animation previews to Google Drive so you can review them easily and always have access to the latest versions.</span>
@@ -1262,7 +1276,7 @@
             <label class="option"><input type="checkbox" value="Dropbox (Delivery)"><span class="opt-logo"><img src="logos/dropbox.png" alt="Dropbox" loading="lazy" onerror="this.style.display='none';this.parentNode.classList.add('logo-missing');"></span><span class="option-label">Dropbox <span class="opt-note">· animation previews</span></span>
               <span class="tip"><span class="tip-title">Dropbox · Animation Previews</span>We&rsquo;ll share animation previews via Dropbox so you can quickly access large files and always work with the newest versions.</span>
             </label>
-            <label class="option"><input type="checkbox" value="PicShot Studio Reviewer (Delivery)"><span class="opt-logo"><img src="picshot-logo.png" alt="PicShot Studio" onerror="this.outerHTML='<svg viewBox=&quot;0 0 200 200&quot; aria-hidden=&quot;true&quot;><use href=&quot;#picshotBadge&quot;/></svg>'"></span><span class="option-label">PicShot Studio Reviewer <span class="opt-note">· animation previews</span></span>
+            <label class="option"><input type="checkbox" id="reviewerCb" value="PicShot Studio Reviewer (Delivery)"><span class="opt-logo"><img src="picshot-logo.png" alt="PicShot Studio" onerror="this.outerHTML='<svg viewBox=&quot;0 0 200 200&quot; aria-hidden=&quot;true&quot;><use href=&quot;#picshotBadge&quot;/></svg>'"></span><span class="option-label">PicShot Studio Reviewer <span class="opt-note">· animation previews</span></span>
               <span class="tip"><span class="tip-title">Review PicShot Studio · Animation Previews</span>We&rsquo;ll upload animation previews to our own review platform — watch every version in one place, compare iterations and leave feedback right on the preview.</span>
             </label>
           </div>
@@ -1324,6 +1338,24 @@
       </div>
     </section>
   </div>
+  <!-- PicShot Studio Reviewer intro pop-up -->
+  <div class="modal-overlay" id="reviewerModal" onclick="if(event.target===this) closeReviewer()">
+    <div class="modal-card reviewer-card" style="position:relative;" role="dialog" aria-modal="true" aria-labelledby="reviewerTitle">
+      <button type="button" class="reviewer-close" aria-label="Close" onclick="closeReviewer()">×</button>
+      <span class="reviewer-kicker">Our own software</span>
+      <h2 id="reviewerTitle">Meet PicShot Studio Reviewer</h2>
+      <p>We have our own platform for reviewing animations. Take a quick look — watch every version in one place, compare iterations and leave feedback right on the preview.</p>
+      <div class="reviewer-media" id="reviewerMedia">
+        <!-- Put PicShot_Review_demo.mp4 next to index.html (recommended). A PicShot_Review_demo.gif works too as a fallback. -->
+        <video id="reviewerVideo" src="PicShot_Review_demo.mp4" muted loop playsinline autoplay preload="auto"></video>
+      </div>
+      <div class="reviewer-actions">
+        <button type="button" class="btn btn-primary" onclick="addReviewer()">Add to my picks</button>
+        <button type="button" class="btn btn-secondary" onclick="closeReviewer()">Maybe later</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Success modal -->
   <div class="modal-overlay" id="successModal">
     <div class="modal-card">
@@ -1396,11 +1428,50 @@
     renderDots();
     updateNavButtons();
     if(current === TOTAL_SLIDES - 1) renderSummary();
+    if(!reviewerShown && slides[current].querySelector('#reviewerCb')) setTimeout(() => { if(slides[current].querySelector('#reviewerCb')) openReviewer(); }, 500);
     window.scrollTo({top:0, behavior:'smooth'});
   }
+  /* ---------- PicShot Studio Reviewer pop-up ---------- */
+  let reviewerShown = false;
+  const reviewerVideo = document.getElementById('reviewerVideo');
+  function reviewerFallback(){
+    const media = document.getElementById('reviewerMedia');
+    const img = new Image();
+    img.alt = 'PicShot Studio Reviewer demo';
+    img.onerror = () => {
+      media.innerHTML = '<div class="media-placeholder"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="9" width="40" height="30" rx="6" fill="none" stroke="url(#swooshGrad)" stroke-width="3"/><path d="M20 18 L31 24 L20 30 Z" fill="url(#swooshGrad)"/></svg>Demo coming soon</div>';
+    };
+    img.src = 'PicShot_Review_demo.gif';
+    media.innerHTML = '';
+    media.appendChild(img);
+  }
+  reviewerVideo.addEventListener('error', reviewerFallback);
+  /* the video may already have failed before this script ran */
+  if(reviewerVideo.error || reviewerVideo.networkState === 3) reviewerFallback();
+  function openReviewer(){
+    reviewerShown = true;
+    document.getElementById('reviewerModal').classList.add('show');
+    if(reviewerVideo.isConnected && (reviewerVideo.error || reviewerVideo.networkState === 3)) reviewerFallback();
+    const p = reviewerVideo.isConnected && reviewerVideo.play();
+    if(p && p.catch) p.catch(() => {});
+  }
+  function closeReviewer(){
+    document.getElementById('reviewerModal').classList.remove('show');
+    if(reviewerVideo.isConnected) reviewerVideo.pause();
+  }
+  function addReviewer(){
+    const cb = document.getElementById('reviewerCb');
+    if(!cb.checked){ cb.checked = true; cb.dispatchEvent(new Event('change')); }
+    closeReviewer();
+  }
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && document.getElementById('reviewerModal').classList.contains('show')) closeReviewer();
+  });
+
   function nextSlide(){ goTo(current+1); }
   function prevSlide(){ goTo(current-1); }
   document.addEventListener('keydown', (e)=>{
+    if(document.getElementById('reviewerModal').classList.contains('show')) return;
     if(e.key === 'ArrowRight') nextSlide();
     if(e.key === 'ArrowLeft') prevSlide();
   });
